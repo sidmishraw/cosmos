@@ -5,10 +5,12 @@
 > All demonstrates are VALID version
 
 ## Index
-- [Code width and alignment](#code-width-and-alignment)
-- [Including Header Files](#including-header-files)
 - [Comments](#comments)
-- [Namespaces](#namespaces)
+- [Code Width and Alignment](#code-width-and-alignment)
+- [Spaces](#spaces)
+- [Indentations](#indentations)
+- [Newlines](#newlines)
+- [Braces](#braces)
 - [Naming](#naming)
   <details open>
     <summary>categories</summary>
@@ -21,75 +23,12 @@
         <li><a href="#exceptions-to-naming-rules">Exceptions to Naming Rules</a></li>
     </ul>
   </details>
-- [Braces](#braces)
+- [Including Header Files](#including-header-files)
+- [Namespaces](#namespaces)
 - [Functions](#functions)
 - [Classes](#classes)
 - [Enumerations](#enumerations)
-- [Alias](#alias)
-
-## Code width and alignment
-- Try to limit code width to 100 characters.
-
-- Split lines as close to the code width as possible (if a parameter is split onto another line, then all of the parameters should be split).
-
-- If the width is less than or equal to the maximum code width, then do not split the line (unless split at return type or for readability).
-
-- Template definitions should be split.
-
-```C++
-// n <= 100 columns
-bool operator==(container<T,Allocator> x, container<T,Allocator> y);
-
-bool
-operator==(container<T,Allocator> x, container<T,Allocator> y);
-
-template<class T, class Allocator>
-bool operator==(container<T,Allocator> x, container<T,Allocator> y);
-
-template<class T, class Allocator>
-bool
-operator==(container<T,Allocator> x, container<T,Allocator> y);
-
-// n > 100 columns
-void cloneTwo(const container<T,Allocator>& x,
-              const container<T,Allocator>& y,
-              const container<T,Allocator>& z);
-
-void
-cloneTwo(const container<T,Allocator>& x,
-         const container<T,Allocator>& y,
-         const container<T,Allocator>& z);
-```
-
-## Including Header Files
-When including header files, only include files that are _portable_ across all compilers (Unless where applicable). Do not include `<bits/stdc++.h>`.
-
-Pay attention to whether the header is _not in use_, and do not include it if so. If only the implementation uses it, then include the file in .cpp, not .hpp.
-
-```C++
-// sample1.hpp
-#include <vector>       // ok, return type is vector
-
-template<typename Ty>
-std::vector<Ty> toVector(Ty t[], size_t sz);
-
-
-// sample2.hpp
-class ListHelp
-{
-    void sort();
-};
-
-// sample2.cpp
-#include "sample2.hpp"
-#include <utility>      // ok, only use the swap function in implementation
-using namespace std;
-
-void ListHelp::sort()
-{
-    // use the swap function
-}
-```
+- [Aliases](#aliases)
 
 ## Comments
 Single line comments should use the standard style (`//`), and multi line comments should use multiline comments (`/* */`). There should be a space between the comment delimiter and the comment text (unless pure-code synopsis).
@@ -102,13 +41,13 @@ Single line comments should use the standard style (`//`), and multi line commen
  * Multiline comment
  *
  */
- 
+
 /*
- 
+
  Simple multiline comment
- 
+
  vector synopsis
- 
+
 template <class T, class Allocator = allocator<T> >
 class vector
 {
@@ -119,34 +58,216 @@ public:
 */
 ```
 
-## Namespaces
-When using namespace, pay attention to name collisions/name conflicts:
+## Code Width and Alignment
+- Try to limit code width to 100 characters.
 
-In header files, do not use `using` directive or declaration.
+- Split lines as close to the code width as possible (if a parameter is split onto another line, then all of the parameters should be split).
+
+- If the width is less than or equal to the maximum code width, then do not split the line (unless split at return type or for readability).
+
+- Template definitions should be split.
 
 ```C++
-// sample1.hpp
-#include <vector>
+// n <= 100 columns
+bool operator==(Container<Type, Allocator> x, Container<T, Allocator> y);
 
-// ok, if users include this file, they also need declare std namespace to use member of vector
-template<typename Ty>
-std::vector<Ty> toVector(Ty t[], size_t sz);
+bool
+operator==(Container<Type, Allocator> x, Container<T, Allocator> y);
 
+template<class OtherType, class OtherAllocator>
+bool operator==(Container<OtherType, OtherAllocator> x, Container<OtherType, OtherAllocator> y);
 
-// sample2.hpp
-class ListHelp
+template<class OtherType, class OtherAllocator>
+bool
+operator==(Container<OtherType, OtherAllocator> x, Container<OtherType, OtherAllocator> y);
+
+// n > 100 columns
+void cloneTwo(Container<Type, Allocator> foo,
+              Container<Type, Allocator> bar,
+              Container<Type, Allocator> baz);
+
+template<class OtherType, class OtherAllocator>
+void
+cloneTwo(Container<OtherType, OtherAllocator> foo,
+         Container<OtherType, OtherAllocator> bar,
+         Container<OtherType, OtherAllocator> baz);
+```
+
+- The pointers `*` `**` and references `&` `&&` `*&` should be part of the variable/function name (even if variable name is not declared) or qualifier. Add a space between previous types or qualifiers (unless `**`, `&&`, and `*&`).
+
+```C++
+// pointers and references
+int a = 0;
+
+int *pa = &a;
+int *&rpa = pa;
+int **ppa = &pa;
+int &&rr = 0;
+
+bool operator==(int *x, int *y);
+
+bool operator==(int *const *x, int *const *y);
+
+bool operator==(const int **const x, const int **const y);
+
+bool &getReference();
+
+bool *&getPointer();
+
+bool *const getConstPointer();
+
+bool *const &getReferenceOfConstPointer();
+
+// even if variable name is not declared
+bool operator==(int *&, int *&);
+
+bool operator==(int &&, int &&);
+```
+
+- The `const` qualifier should be on the right hand side of its target but to the left of the type.
+
+```C++
+class Dummy
+{   
+    const int value() const;
+
+    void value(const int *const v);
+
+    int *getPointer();
+
+    const int *const *getOtherPointer() const;
+};
+```
+
+## Spaces
+Put one space:
+
+- After commas.
+
+- Between operators.
+
+- Between condition and its opening brace.
+
+- Around initializer of class constructor;
+
+Remove spaces:
+
+- In whitespace-only line.
+
+- After opening brace/parenthese, and before closing brace/parenthes.
+
+- Between empty braces, and parentheses.
+
+Be clear, the demo not follow the Newline rules:
+```C++
+while ()    // 1 space between while and '(', 0 space between parentheses.
+{           // 0 space after opening brace-only line.
+
+    if (true)                   // 1 space between if and '('.
+    {
+        ClassName obj{1, 2, 3}; // 0 space after '{', before '}'.
+
+        int i = (1 + 1) * 1;    // 1 space around '=', '+', and '*'.
+
+        doSomthing(obj, i, 1);  // 1 space after commas.
+    }
+
+}           // 0 space after closing brace-only line.
+```
+
+## Indentations
+Use only spaces, and indent 4 spaces at a time.
+
+We use spaces for indentation. Do not use tabs in our code.
+
+```C++
+bool predicateFunc(vector<int> vec) {
+    for (; condition; )     //  4 spaces
+        if (condition)      //  8 spaces
+            return false;   // 12 spaces
+                            // none space
+    return true;            //  4 spaces
+}
+```
+
+## Newlines
+Add newline:
+
+- Between two functions, classes, and conditions.
+
+- After `#define`, `#include`.
+
+- Between preconditions and its scope (ignore between preconditions).
+
+```C++
+#include <iostream>
+
+#ifndef DDD     // no newline between #ifndef and #define line
+#define DDD
+
+int func1();
+
+int func2()
 {
-    void sort();
+    int a{1}, b{0};
+    if (a == b)
+        // ...
+
+    while (a - b > 0)
+        // ...
 }
 
-// sample2.cpp
-#include "sample2.hpp"
-#include <utility>
-using namespace std;    // ok, users will include .hpp not .cpp
+class A;
 
-void ListHelp::sort()
+class B
 {
-    // may use the swap function
+public:
+    int func1();
+
+    int func2()
+    {
+        // ...
+    }
+
+private:
+    int v1;
+    bool v2;
+
+    int func3();
+}
+
+#endif
+```
+
+## Braces
+When using braces, put them on their own lines. `for`s, `if`s and loops that have one line statements, omit the braces (unless 1. between `do` and `while` on do-while statements, 2. dangling else).
+
+```C++
+int main()
+{
+    if (condition) 
+    {
+        statement;
+        statement;
+    }
+    else
+        statement;
+
+    if (condition)
+    {
+        if (condition)
+            statement;
+        else
+            statement;
+    }
+
+    for (;condition;)
+       statement;
+
+    do
+    {
+        statement;
+    } while (condition);
 }
 ```
 
@@ -244,44 +365,65 @@ long BUFFER_MAX ...    // a constant, as in INT_MAX
 using diff_t ...       // as in ptrdiff_t
 ```
 
-## Braces
-When using braces, put them on their own lines. `for`s, `if`s and loops that have one line statements, omit the braces (unless 1. between `do` and `while` on do-while statements, 2. dangling else).
+## Including Header Files
+When including header files, only include files that are _portable_ across all compilers (Unless where applicable). Do not include `<bits/stdc++.h>`.
+
+Pay attention to whether the header is _not in use_, and do not include it if so. If only the implementation uses it, then include the file in .cpp, not .hpp.
 
 ```C++
-int main()
+// sample1.hpp
+#include <vector>       // ok, return type is vector
+
+template<typename Ty>
+std::vector<Ty> toVector(Ty t[], size_t sz);
+
+
+// sample2.hpp
+class ListHelp
 {
-    if (condition) 
-    {
-        statement;
-        statement;
-    }
-    else
-        statement;
+    void sort();
+};
 
-    if (condition)
-    {
-        if (condition)
-            statement;
-        else
-            statement;
-    }
+// sample2.cpp
+#include "sample2.hpp"
+#include <utility>      // ok, only use the swap function in implementation
+using namespace std;
 
-    for (;condition;)
-       statement;
-
-    do
-    {
-        statement;
-    } while (condition);
+void ListHelp::sort()
+{
+    // use the swap function
 }
 ```
 
-On a side note, for conditionals and loops, put a space between the keyword and the opening parentheses, and another space after the closing parentheses.
+## Namespaces
+When using namespaces, pay attention to name collisions/name conflicts:
 
-When using class initialization with braces, then place a space after the opening brace, and before the closing brace.
+In header files, do not use a `using` directive or declaration.
 
 ```C++
-ClassName objectName{ 1, 4 };
+// sample1.hpp
+#include <vector>
+
+// ok, if users include this file, they also need to declare std namespace to use member of vector
+template<typename Ty>
+std::vector<Ty> toVector(Ty t[], size_t sz);
+
+
+// sample2.hpp
+class ListHelp
+{
+    void sort();
+}
+
+// sample2.cpp
+#include "sample2.hpp"
+#include <utility>
+using namespace std;    // ok, users will include .hpp not .cpp
+
+void ListHelp::sort()
+{
+    // may use the swap function
+}
 ```
 
 ## Functions
@@ -296,7 +438,7 @@ void exampleFunction(int pod, const Example& object, char& modifiableChar)
 ```
 
 ## Classes
-### Order of Encapsulation
+### Order of encapsulation
 When listing members of a class, if possible list them in the order public, private, then protected. If using `using` for aliases, or using base class constructors, then the order can be broken. In this case, if possible, try and list the public interface of the class first.
 Encapsulation labels should be indented to the same level as the class. Add a new line after the end of each label for readability.
 
@@ -320,7 +462,7 @@ protected:
 };
 ```
 
-### Order of Member Functions
+### Order of member functions
 When listing member functions of a class, first list the main constructor, then secondary constructors, and then copy assignment/copy construction/move assignment/move construction functions.
 After this, add the destructor. Then, add a new line, and then list all members of the class.
 
@@ -349,7 +491,7 @@ When dealing with enumerations, use `enum class`, not `enum` (Unless dealing wit
 
 Warning: if you dealing with low-level operation, and need use explicit type convertion, you must be careful about underlying type (default is the `int` it at least 2-bytes).
 
-## Alias
+## Aliases
 ### using vs typedef
 When dealing with aliases, use `using`, not `typedef`.
 
@@ -360,7 +502,6 @@ Don't put alias in `public`, unless the aliases is guaranteed to always be the s
 - More easily declare an alias with template.
 
 - [See more comparisons](http://www.stroustrup.com/C++11FAQ.html#template-alias)
-
 
 
 ---
